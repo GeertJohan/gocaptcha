@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"text/template"
 )
 
@@ -92,16 +92,16 @@ func (gc *GoCaptcha) HtmlByteSlice() ([]byte, error) {
 // Expected parameters:
 // challenge string, form value as sent by the http request. (Set by the reCAPTCHA in the end-users browser.)
 // response string, form value as sent by the http request. (The answer given by the end-user.)
-// remoteaddr string, The ip address (i.e. "127.0.0.1") or http.Request.RemoteAddr (i.e. "127.0.0.1:45435") from the client's endpoint.
-// Warning: at this moment only IPv4 remoteaddr is supported. Major bug!!!
+// remoteaddr string, The http.Request.RemoteAddr (i.e. "127.0.0.1:45435") from the client's endpoint.
 func (gc *GoCaptcha) Verify(challenge string, response string, remoteaddr string) (bool, error) {
 	if gc.lastResult {
 		return false, errors.New("This GoCaptcha session has already been successfully verified. Please create a new GoCaptcha session.")
 	}
 
-	//++ WARNING: This will NOT work with IPv6. Major bug!
-	//++ TODO(GeertJohan): pickup the ip properly.
-	remoteip := strings.SplitN(remoteaddr, ":", 2)[0]
+	remoteip, _, err := net.SplitHostPort(remoteaddr)
+	if err != nil {
+		return false, err
+	}
 
 	apiRequestValues := url.Values{}
 	apiRequestValues.Set("privatekey", gc.privatekey)
