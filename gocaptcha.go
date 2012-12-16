@@ -13,11 +13,11 @@ import (
 	"text/template"
 )
 
-var captchaHtml *template.Template
+var captchaHTML *template.Template
 
 func init() {
 	var err error
-	captchaHtml, err = template.New("CaptchaHtml").Parse(`
+	captchaHTML, err = template.New("CaptchaHTML").Parse(`
 <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k={{.PublicKey}}&error={{.ErrorCode}}"></script>
 <noscript>
 	<iframe src="http://www.google.com/recaptcha/api/noscript?k={{.PublicKey}}&error={{.ErrorCode}}" height="300" width="500" frameborder="0"></iframe><br>
@@ -26,14 +26,14 @@ func init() {
 </noscript>
 `)
 	if err != nil {
-		fmt.Printf("Error parsing CaptchaHtml template.")
+		fmt.Printf("Error parsing CaptchaHTML template.")
 		os.Exit(-1)
 	}
 }
 
 // A GoCaptcha object identifies a single reCAPTCHA session (for one client).
 // It is possible to store this object on a session activity and re-use it lateron for verification.
-// This object keeps track of faulty verifications and makes sure any newly generated html contains an error message for the end-user, as provided by reCAPTCHA.
+// This object keeps track of faulty verifications and makes sure any newly generated HTML contains an error message for the end-user, as provided by reCAPTCHA.
 // Once a reCAPTCHA response was successfully verified this object should be discarded.
 type GoCaptcha struct {
 	publickey     string
@@ -52,31 +52,31 @@ func NewGoCaptcha(publickey string, privatekey string) *GoCaptcha {
 	return gc
 }
 
-// Generate the reCAPTCHA html for this session and write it to the given io.Writer.
-func (gc *GoCaptcha) WriteHtml(w io.Writer) error {
-	err := captchaHtml.Execute(w, struct {
+// Generate the reCAPTCHA HTML for this session and write it to the given io.Writer.
+func (gc *GoCaptcha) WriteHTML(w io.Writer) error {
+	err := captchaHTML.Execute(w, struct {
 		PublicKey string
 		ErrorCode string
 	}{gc.publickey, gc.lastErrorCode})
 	return err
 }
 
-// Generate the reCAPTCHA html for this session and return it as string.
+// Generate the reCAPTCHA HTML for this session and return it as string.
 // If error is not nil then something went wrong and string is empty.
-func (gc *GoCaptcha) HtmlString() (string, error) {
+func (gc *GoCaptcha) HTMLString() (string, error) {
 	buf := new(bytes.Buffer)
-	err := gc.WriteHtml(buf)
+	err := gc.WriteHTML(buf)
 	if err != nil {
 		return "", err
 	}
 	return buf.String(), nil
 }
 
-// Generate the reCAPTCHA html for this session and return it as byteslice.
+// Generate the reCAPTCHA HTML for this session and return it as byteslice.
 // If error is not nil then something went wrong and the byteslice is empty.
-func (gc *GoCaptcha) HtmlByteSlice() ([]byte, error) {
+func (gc *GoCaptcha) HTMLBytes() ([]byte, error) {
 	buf := new(bytes.Buffer)
-	err := gc.WriteHtml(buf)
+	err := gc.WriteHTML(buf)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -87,7 +87,7 @@ func (gc *GoCaptcha) HtmlByteSlice() ([]byte, error) {
 // Any returned error indicates a unsuccessfull api call. It does not indicate that the reCAPTCHA response by the end-user was faulty.
 // Any returned error value is not to be shown to the end-user.
 // When the error is nil, then response=false indicates that the reCAPTCHA response by the end-user was faulty.
-// End-user will be notified of a faulty reCAPTCHA response when re-using this GoCaptcha object to generate html code again.
+// End-user will be notified of a faulty reCAPTCHA response when re-using this GoCaptcha object to generate HTML code again.
 // 
 // Expected parameters:
 // challenge string, form value as sent by the http request. (Set by the reCAPTCHA in the end-users browser.)
