@@ -1,4 +1,4 @@
-gocaptcha makes [reCaptcha](http://www.google.com/recaptcha) in [go](golang.org) easy.
+gocaptcha provides easy access to the [reCaptcha](https://www.google.com/recaptcha) API in [go](https://golang.org).
 
 TODO:
 - actually finish the pkg ;)
