@@ -92,7 +92,7 @@ func (gc *GoCaptcha) HtmlByteSlice() ([]byte, error) {
 // Expected parameters:
 // challenge string, form value as sent by the http request. (Set by the reCAPTCHA in the end-users browser.)
 // response string, form value as sent by the http request. (The answer given by the end-user.)
-// remoteaddr string, The http.Request.RemoteAddr (i.e. "127.0.0.1:45435") from the client's endpoint.
+// remoteaddr string, The http.Request.RemoteAddr (e.g. "127.0.0.1:45435") from the client's endpoint.
 func (gc *GoCaptcha) Verify(challenge string, response string, remoteaddr string) (bool, error) {
 	if gc.lastResult {
 		return false, errors.New("This GoCaptcha session has already been successfully verified. Please create a new GoCaptcha session.")
