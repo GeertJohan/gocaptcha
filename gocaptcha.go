@@ -110,7 +110,7 @@ func (gc *GoCaptcha) Verify(challenge string, response string, remoteaddr string
 	apiRequestValues.Set("response", response)
 	apiResponse, err := http.PostForm("https://www.google.com/recaptcha/api/verify", apiRequestValues)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 	defer apiResponse.Body.Close()
 	reader := bufio.NewReader(apiResponse.Body)
